@@ -1,0 +1,12 @@
+.home {
+background: url(bg2.jpg) center no-repeat fixed;
+height: 100%;
+position: relative;
+width: 100%;
+-khtml-background-size: cover;
+-moz-background-size: cover;
+-ms-background-size: cover;
+-o-background-size: cover;
+-webkit-background-size: cover;
+background-size: cover;
+}
