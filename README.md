@@ -1,4 +1,3 @@
-# stalkernews.github.io
 # stalkernews
 # STALKER NEWS
 # Stalker news
