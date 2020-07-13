@@ -1,0 +1,3 @@
+User-agent: *
+Host: github.io
+Sitemap: http://STALKERNEWS.github.io/sitemap.xml
