@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<script type="text/javascript" src="https://vk.com/js/api/openapi.js?168"></script>
+
+<script type="text/javascript">
+  VK.init({apiId: API_ID, onlyWidgets: true});
+</script>
 <script type="text/javascript" src="https://vk.com/js/api/openapi.js?168"></script>
 	<title>STALKER NEWS</title>
 	<link rel="icon" href="ico.png" type="image/x-icon">
@@ -147,6 +152,10 @@ onmouseout="this.src='img/скач1.png'; this.width=113;this.height=25;" /></a>
     h.appendChild(s);
   }})();</script>
 <div class="pluso" data-background="none;" data-options="medium,square,line,horizontal,nocounter,sepcounter=1,theme=14" data-services="vkontakte,odnoklassniki,moimir"></div>
+				<div id="vk_comments"></div>
+<script type="text/javascript">
+VK.Widgets.Comments("vk_comments", {limit: 5, attach: "*"});
+</script>
 			</div>
 		</footer>
 	</div>
