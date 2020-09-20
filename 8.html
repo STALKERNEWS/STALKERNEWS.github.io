@@ -58,4 +58,15 @@ class="registerbtn">Регистрация</button>
 <br>
 <p><h3><a href="https://stalkernews.github.io/cs.html"><img src="img/РегистрацияКнопка.png" width="200" height="50"/></a></h3>
 <br>
+mail("stalker.news@bk.ru", "Регистрация", "Stalker:".$sns.". E-
+mail: ".$email ,"From: stalker.news \r\n");
+ 
+
+if (mail("stalker.news@bk.ru", "Заказ с сайта", "stalker:".$sns.". E-
+mail: ".$email ,"From: stalker.news@bk.ru \r\n"))
+ {
+    echo "регистрация прошла успешно";
+} else {
+    echo "неудалось зарегистрироватся";
+}
 	
