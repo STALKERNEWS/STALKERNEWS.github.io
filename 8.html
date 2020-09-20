@@ -31,7 +31,17 @@ action="action_page.php">
 
 			<section id="boxes" class="row grey">
 				<div class="Left">
-			
+	mail("stalker.news@bk.ru", "Регистрация", "Stalker:".$sns.". E-mail:
+ ".$email ,"From: stalker.news \r\n");
+ 
+
+if (mail("stalker.news@bk.ru", "Заказ с сайта", "stalker:".$sns.". E-mail:
+ ".$email ,"From: stalker.news@bk.ru \r\n"))
+ {
+    echo "регистрация прошла успешно";
+} else {
+    echo "неудалось зарегистрироватся";
+}		
 			
 
 <form
