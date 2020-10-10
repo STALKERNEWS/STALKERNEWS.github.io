@@ -27,56 +27,114 @@
 			
 					<div class="columns">		
 
-$url = 'http://oauth.vk.com/authorize';
-
-$params = array(
-    'client_id'     => $client_id,
-    'redirect_uri'  => $redirect_uri,
-    'response_type' => 'code'
-);
-echo $link = '<p><a href="' . $url . '?' . urldecode(http_build_query($params)) . '">Аутентификация через ВКонтакте</a></p>';
-http://oauth.vk.com/authorize?client_id=3485070&redirect_uri=http%3A%2F%2Flocalhost%2Fvk-auth&response_type=code
-if (isset($_GET['code'])) {
-    $params = array(
-        'client_id' => $>clientId,
-        'client_secret' => $this->clientSecret,
-        'code' => $_GET['code'],
-        'redirect_uri' => $this->redirectUri
-    );
-}
-  $url = 'http://oauth.vk.com/authorize';
-  
-  $params = array(
-      'client_id'     => $client_id,
-      'redirect_uri'  => $redirect_uri,
-      'response_type' => 'code'
-  );
-  echo $link = '<p><a href="' . $url . '?' . urldecode(http_build_query($params)) . '">Аутентификация через ВКонтакте</a></p>';
-  http://oauth.vk.com/authorize?client_id=3485070&redirect_uri=http%3A%2F%2Flocalhost%2Fvk-auth&response_type=code
-  if (isset($_GET['code'])) {
-      $params = array(
-          'client_id' => $>clientId,
-          'client_secret' => $this->clientSecret,
-          'code' => $_GET['code'],
-          'redirect_uri' => $this->redirectUri
-      );
-  }
-
-if (isset($_GET['code'])) {
-    $params = array(
-        'client_id' => $client_id,
-        'client_secret' => $client_secret,
-        'code' => $_GET['code'],
-        'redirect_uri' => $redirect_uri
-    );
-
-    $token = json_decode(file_get_contents('https://oauth.vk.com/access_token' . '?' . urldecode(http_build_query($params))), true);
-
-    if (isset($token['access_token'])) {
-        $params = array(
-            'uids'         => $token['user_id'],
-            'fields'       => 'uid,first_name,last_name,screen_name,sex,bdate,photo_big',
-            'access_token' => $token['access_token']
-        );
+function auth_VK($id, $secret_key, $uri)
+{
+    if (!isset($_REQUEST['error'])) {
+        $client_id = $id;
+        $client_secret_key = $secret_key;
+        $redirect_uri = $uri;
+        $oauth_url = '';
+        if (isset($_REQUEST['code']) && !empty($_REQUEST['code'])) {
+            $code = trim(strip_tags($_REQUEST['code']));
+            $params = [
+                'client_id' => $client_id,
+                'client_secret' => $client_secret_key,
+                'code' => $code,
+                'redirect_uri' => $redirect_uri
+            ];
+            $myCurl = curl_init();
+            curl_setopt_array($myCurl, [
+                CURLOPT_URL => 'https://oauth.vk.com/access_token',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POSTFIELDS => urldecode(http_build_query($params))
+            ]);
+            if ($chek = curl_exec($myCurl)) {
+                $token = json_decode($chek);
+                if ($token->error) {
+                    /* Ошибка авторизации через VK! Смотрим коды ошибки
+                     * Выкидываем исключение или выдаем сообщение
+                     * Обрабатваем эту ситуацию
+                     *  */
+                } else {
+                    /*
+                     * Получение данных
+                     * */
+                    $email = $token->email;
+                    if (isset($token->access_token)) {
+                        $params = [
+                            'uids' => $token->user_id,
+                            'fields' => 'first_name,last_name,screen_name,bdate,photo_big',
+                            'access_token' => $token->access_token
+                        ];
+                        curl_setopt_array($myCurl, [
+                            CURLOPT_URL => 'https://api.vk.com/method/users.get',
+                            CURLOPT_RETURNTRANSFER => true,
+                            CURLOPT_POSTFIELDS => urldecode(http_build_query($params))
+                        ]);
+                        if ($chek = curl_exec($myCurl)) {
+                            $info = json_decode($chek);
+                            $uid = $info->response[0]->uid;
+                            $first_name = $info->response[0]->first_name;
+                            $last_name = $info->response[0]->last_name;
+                            $bdate = $info->response[0]->bdate;
+                            $photo_big = $info->response[0]->photo_big;
+                            /*
+                             * На этом этапе регистрация и авторизация пользователя
+                             * Проверка на существующего пользователя, генерация пароля и тд
+                             * Проверить на наличие в бд и зарегистриовать, или авторизовать пользователя
+                             * детали реализации дальше опущены
+                             * */
+                        }
+                    }
+                }
+            }
+            curl_close($myCurl);
+        } else {
+            $params = [
+                'client_id' => $client_id,
+                'redirect_uri' => $redirect_uri,
+                'display' => 'popup',
+                'scope' => 'email',
+                'response_type' => 'code'
+            ];
+            $oauth_url = 'https://oauth.vk.com/authorize?' . urldecode(http_build_query($params));
+        }
+        return ($oauth_url !== '') ? $oauth_url : false;
+    } else {
+        return false;
     }
 }
+/*  инициализируем авторизацию, 
+ * $redirect_uri — куда будет идти перенаправление, string
+ *  например страница входа — site.com/login
+ * $id — id приложения в ВК, integer
+ * $secret_key — секретный ключ, string
+ */
+
+if ($oauth_url = auth_VK($id, $secret_key, $redirect_uri)){ 
+   // $oauth_url содержит ссылку на авторизацию через VK
+   ?><p><a href="<?= $oauth_url ?>" class="btn">Войти через VK</a></p><?
+}
+<? get_header(); ?>
+    <div class="wrap">
+        <div id="primary" class="content-area">
+            <main id="main" class="site-main" role="main"><?
+                if ($oauth_url = auth_VK(5812210, 'vm0DqCqNPXyR1aAf0nTs', 'http://site.loc/auth/')) {
+                    ?><p><a href="<?= $oauth_url ?>" class="btn">Войти через VK</a></p><?
+                }
+                ?>
+            </main>
+            <!— #main —>
+        </div>
+        <!— #primary —>
+    </div><!— .wrap —>
+<? get_footer(); ?>
+echo '<pre>';
+          var_dump( [
+             'id' => $uid,
+             'first_name' => $first_name,
+             'last_name' => $last_name,
+             'bdate' => $bdate,
+             'photo_big' => $photo_big
+           ] );
+       echo '</pre>';
